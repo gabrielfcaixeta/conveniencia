@@ -583,10 +583,11 @@ async function loadNotinhas(){
   if(snap.empty){grid.innerHTML='<p style="color:var(--muted)">Nenhum profissional cadastrado.</p>';return;}
   snap.forEach(doc=>{
     const p={id:doc.id,...doc.data()};const s=p.saldo_devedor||0;
-    const c=document.createElement('div');c.className='nc';c.onclick=()=>abrirDetNot(p.id,p.nome);
+    const card=document.createElement('div');card.className='nc';card.onclick=()=>abrirDetNot(p.id,p.nome);
     const cls=s>0?'dev':s<0?'crd':'ok';const sl=s>0?fmt(s):s<0?'Credito: '+fmt(Math.abs(s)):'Em dia';
-    c.innerHTML='<div style="display:flex;justify-content:space-between;align-items:start"><div class="nc-nm">'+p.nome+'</div><button onclick="event.stopPropagation();gerarLink(\'''+p.id+'\')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted)" title="Gerar link da notinha">🔗</button></div><div class="nc-sd '+cls+'">'+sl+'</div><div class="nc-it">Bonificacao: '+fmt(p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100)+'/mes</div>';
-    grid.appendChild(c);
+    card.innerHTML='<div style="display:flex;justify-content:space-between"><div class="nc-nm">'+p.nome+'</div><span id="lnk-'+p.id+'" style="cursor:pointer;font-size:15px;opacity:.6">&#128279;</span></div><div class="nc-sd '+cls+'">'+sl+'</div><div class="nc-it">Bonificacao: '+fmt(p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100)+'/mes</div>';
+    grid.appendChild(card);
+    document.getElementById('lnk-'+p.id).onclick=e=>{e.stopPropagation();gerarLink(p.id);};
   });
 }
 async function abrirDetNot(id,nm){
