@@ -333,7 +333,7 @@ function tipoBadge(t){const m={venda_paciente:'<span class="bg bg-g">Venda Pac.<
 function pagBadge(p){if(!p)return'<span style="color:var(--muted)">-</span>';const m={dinheiro:'Dinheiro',pix:'PIX',debito:'Debito',credito:'Credito',notinha:'Notinha'};return m[p]||p;}
 
 async function loadLoginUsers(){
-  const snap=await db.collection('secretarias').where('ativo','==',true).orderBy('nome').get();
+  const snap=await db.collection('secretarias').where('ativo','==',true).get();
   const sel=document.getElementById('lo-usr');sel.innerHTML='';
   if(snap.empty){sel.innerHTML='<option value="__first__">Criar Administrador (Primeiro Acesso)</option>';return;}
   snap.forEach(doc=>{const o=document.createElement('option');o.value=doc.id;o.textContent=doc.data().nome;sel.appendChild(o);});
@@ -379,8 +379,8 @@ function nav(s){
 }
 
 async function loadCaches(){
-  const[ps,prs]=await Promise.all([db.collection('produtos').where('ativo','==',true).orderBy('nome').get(),db.collection('profissionais').where('ativo','==',true).orderBy('nome').get()]);
-  PC=ps.docs.map(d=>({id:d.id,...d.data()}));PRC=prs.docs.map(d=>({id:d.id,...d.data()}));
+  const[ps,prs]=await Promise.all([db.collection('produtos').where('ativo','==',true).get(),db.collection('profissionais').where('ativo','==',true).get()]);
+  PC=ps.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.nome.localeCompare(b.nome));PRC=prs.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.nome.localeCompare(b.nome));
 }
 
 async function loadCfg(){
@@ -478,7 +478,7 @@ async function confirmarEstoque(){
 
 async function loadNotinhas(){
   document.getElementById('not-grid').style.display='grid';document.getElementById('not-det').style.display='none';
-  const snap=await db.collection('profissionais').where('ativo','==',true).orderBy('nome').get();
+  const snap=await db.collection('profissionais').where('ativo','==',true).get();
   const grid=document.getElementById('not-grid');grid.innerHTML='';
   if(snap.empty){grid.innerHTML='<p style="color:var(--muted)">Nenhum profissional cadastrado.</p>';return;}
   snap.forEach(doc=>{
@@ -579,7 +579,7 @@ async function confirmarErro(){
 }
 
 async function loadProdutos(){
-  const snap=await db.collection('produtos').orderBy('nome').get();const tb=document.getElementById('p-tb');tb.innerHTML='';
+  const snap=await db.collection('produtos').get();const tb=document.getElementById('p-tb');tb.innerHTML='';
   let prods=snap.docs.map(d=>({id:d.id,...d.data()}));
   if(PFILTRO==='conveniencia')prods=prods.filter(p=>p.ativo&&p.grupo==='conveniencia');
   else if(PFILTRO==='livraria')prods=prods.filter(p=>p.ativo&&p.grupo==='livraria');
@@ -600,7 +600,7 @@ async function salvarProd(){
 async function toggleProd(id,ativo){await db.collection('produtos').doc(id).update({ativo:!ativo});await loadCaches();loadProdutos();}
 
 async function loadProfTable(){
-  const snap=await db.collection('profissionais').orderBy('nome').get();const tb=document.getElementById('pr-tb');tb.innerHTML='';
+  const snap=await db.collection('profissionais').get();const tb=document.getElementById('pr-tb');tb.innerHTML='';
   if(snap.empty){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Nenhum profissional cadastrado</td></tr>';return;}
   snap.forEach(doc=>{const p={id:doc.id,...doc.data()};const sd=p.saldo_devedor||0;const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:500">'+p.nome+'</td><td style="font-family:var(--mo);color:'+(sd>0?'var(--red)':sd<0?'var(--grn)':'var(--muted)')+'">'+( sd>0?fmt(sd):sd<0?'Credito '+fmt(Math.abs(sd)):'Em dia')+'</td><td style="font-family:var(--mo)">'+fmt(p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100)+'</td><td>'+(p.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+'</td><td style="display:flex;gap:6px"><button class="btn btn-s btn-sm" onclick=\'editProf('+JSON.stringify(p)+')\'>Editar</button><button class="btn btn-s btn-sm" onclick="toggleProf(\''+p.id+'\','+p.ativo+')">'+(p.ativo?'Desativar':'Ativar')+'</button></td>';tb.appendChild(tr);});
 }
@@ -624,7 +624,7 @@ async function loadHistorico(){
 }
 
 async function loadSecLista(){
-  const snap=await db.collection('secretarias').orderBy('nome').get();const div=document.getElementById('sec-lista');div.innerHTML='';
+  const snap=await db.collection('secretarias').get();const div=document.getElementById('sec-lista');div.innerHTML='';
   snap.forEach(doc=>{const s=doc.data();const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:13px';row.innerHTML='<span style="font-weight:500">'+s.nome+'</span>'+(s.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>');div.appendChild(row);});
 }
 function abrirSec(){document.getElementById('ms-nm').value='';document.getElementById('ms-pin').value='';document.getElementById('ms-pin2').value='';openM('m-sec');}
