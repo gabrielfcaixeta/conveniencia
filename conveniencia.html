@@ -107,6 +107,8 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
 .nc-sd.dev{color:var(--red)}.nc-sd.ok{color:var(--muted)}.nc-sd.crd{color:var(--grn)}
 .nc-it{font-size:11px;color:var(--muted);margin-top:3px}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+.carrinho-item{animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:768px){
   :root{--sw:0px}
   .sb{bottom:0;top:auto;width:100%;height:56px;flex-direction:row;overflow:hidden}
@@ -161,12 +163,12 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
     <button class="ni" onclick="nav('notinhas')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Notinhas</button>
     <button class="ni" onclick="nav('caixa')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Caixa</button>
     <div class="ns-lbl">Cadastros</div>
-    <button class="ni" onclick="nav('posicao')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Estoque Atual</button>
+    <button class="ni" id="nav-posicao" onclick="nav('posicao')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Estoque Atual</button>
     <button class="ni" onclick="nav('profissionais')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>Profissionais</button>
     <div class="ns-lbl">Sistema</div>
     <button class="ni" onclick="nav('historico')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Historico</button>
-    <button class="ni" onclick="nav('exportar')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Exportar CSV</button>
-    <button class="ni" onclick="nav('cfg')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Configuracoes</button>
+    <button class="ni" id="nav-exportar" onclick="nav('exportar')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Exportar CSV</button>
+    <button class="ni" id="nav-cfg" onclick="nav('cfg')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Configuracoes</button>
   </nav>
   <div class="sb-ft"><button class="ni" onclick="doLogout()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Sair</button></div>
 </aside>
@@ -193,19 +195,23 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
 <!-- NOVA VENDA -->
 <div class="sec" id="s-venda">
   <div class="sh"><h2>Nova Venda</h2></div>
-  <div style="max-width:560px"><div class="card">
-    <div class="fg"><label class="fl">Produto</label><div class="p-wrap"><input type="text" class="fc" id="v-srch" placeholder="Buscar produto..." oninput="srchP('v')"><div class="psr" id="v-psr" style="display:none"></div></div><input type="hidden" id="v-pid"><div id="v-psel" style="display:none;margin-top:8px;padding:10px 12px;background:var(--grnl);border-radius:6px;font-size:13px;color:var(--grn)"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Quantidade</label><input type="number" class="fc" id="v-qtd" min="1" value="1" oninput="calcV()"></div><div class="fg"><label class="fl">Preco Unit.</label><input type="text" class="fc" id="v-prc" readonly></div></div>
-    <div class="fg"><label class="fl">Tipo de cliente</label><div style="display:flex;gap:8px"><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-tipo" value="paciente" checked onchange="switchTipo()"> Paciente</label><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-tipo" value="profissional" onchange="switchTipo()"> Profissional</label></div></div>
-    <div id="v-pag-blk"><div class="fg"><label class="fl">Forma de Pagamento</label><select class="fc" id="v-pag" onchange="calcV()"><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="debito">Cartao Debito</option><option value="credito">Cartao Credito</option></select></div></div>
-    <div id="v-prof-blk" style="display:none">
-      <div class="fg"><label class="fl">Profissional</label><select class="fc" id="v-prof"><option value="">Selecione...</option></select></div>
-      <div class="fg"><label class="fl">Como vai pagar?</label><div style="display:flex;gap:8px"><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-pgto-prof" value="notinha" checked onchange="switchPgtoprof()"> Notinha</label><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-pgto-prof" value="agora" onchange="switchPgtoprof()"> Pagar agora</label></div></div>
-      <div id="v-prof-pag" style="display:none"><div class="fg"><label class="fl">Forma de Pagamento</label><select class="fc" id="v-pag-prof" onchange="calcV()"><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="debito">Cartao Debito</option><option value="credito">Cartao Credito</option></select></div></div>
+  <div style="max-width:600px">
+    <div class="card" style="margin-bottom:14px">
+      <div class="fg"><label class="fl">Tipo de cliente</label><div style="display:flex;gap:8px"><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-tipo" value="paciente" checked onchange="switchTipo()"> Paciente</label><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-tipo" value="profissional" onchange="switchTipo()"> Profissional</label></div></div>
+      <div id="v-pag-blk"><div class="fg"><label class="fl">Forma de Pagamento</label><select class="fc" id="v-pag" onchange="calcCarrinho()"><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="debito">Cartao Debito</option><option value="credito">Cartao Credito</option></select></div></div>
+      <div id="v-prof-blk" style="display:none">
+        <div class="fg"><label class="fl">Profissional</label><select class="fc" id="v-prof"><option value="">Selecione...</option></select></div>
+        <div class="fg"><label class="fl">Como vai pagar?</label><div style="display:flex;gap:8px"><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-pgto-prof" value="notinha" checked onchange="switchPgtoprof()"> Notinha</label><label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500"><input type="radio" name="v-pgto-prof" value="agora" onchange="switchPgtoprof()"> Pagar agora</label></div></div>
+        <div id="v-prof-pag" style="display:none"><div class="fg"><label class="fl">Forma de Pagamento</label><select class="fc" id="v-pag-prof" onchange="calcCarrinho()"><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="debito">Cartao Debito</option><option value="credito">Cartao Credito</option></select></div></div>
+      </div>
     </div>
-    <div style="background:var(--surf2);border-radius:8px;padding:14px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--muted)">Total</span><span style="font-size:22px;font-weight:700;font-family:var(--mo)" id="v-tot">R$ 0,00</span></div><div id="v-taxa" style="font-size:11px;color:var(--muted);text-align:right;margin-top:2px"></div></div>
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><label class="fl" style="margin:0">Produtos</label><button class="btn btn-s btn-sm" onclick="addItemCarrinho()">+ Adicionar produto</button></div>
+      <div id="v-carrinho" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+      <div style="background:var(--surf2);border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--muted)">Total</span><span style="font-size:22px;font-weight:700;font-family:var(--mo)" id="v-tot">R$ 0,00</span></div><div id="v-taxa" style="font-size:11px;color:var(--muted);text-align:right;margin-top:2px"></div></div>
+    </div>
     <button class="btn btn-p" style="width:100%;justify-content:center;padding:12px;font-size:14px" onclick="confirmarVenda()">Confirmar Venda</button>
-  </div></div>
+  </div>
 </div>
 
 <!-- ESTOQUE -->
@@ -241,11 +247,11 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
 
 <!-- CAIXA -->
 <div class="sec" id="s-caixa">
-  <div class="sh"><h2>Controle de Caixa</h2><div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="abrirCxMov('sangria')">Sangria</button><button class="btn btn-s btn-sm" onclick="abrirCxMov('suprimento')">Suprimento</button></div></div>
+  <div class="sh"><h2>Controle de Caixa</h2><div id="cx-acoes" style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="abrirCxMov('sangria')">Sangria</button><button class="btn btn-s btn-sm" onclick="abrirCxMov('suprimento')">Suprimento</button></div></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px"><input type="date" class="fc" id="cx-ini" style="width:148px"><span style="color:var(--muted)">ate</span><input type="date" class="fc" id="cx-fim" style="width:148px"><button class="btn btn-s btn-sm" onclick="loadCaixa()">Filtrar</button></div>
   <div class="g2" style="margin-bottom:18px">
-    <div class="card"><div class="ct-lbl">Caixa Fisico (Dinheiro)</div><div class="ct-val" id="cx-fis">R$ 0,00</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Vendas dinheiro</span><span style="font-family:var(--mo)" id="cx-edin">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Pgto notinha (dinheiro)</span><span style="font-family:var(--mo)" id="cx-pnot">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Suprimentos</span><span style="font-family:var(--mo);color:var(--grn)" id="cx-supr">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Sangrias</span><span style="font-family:var(--mo);color:var(--red)" id="cx-sang">R$ 0,00</span></div></div></div>
-    <div class="card"><div class="ct-lbl">Caixa Banco (PIX + Cartao)</div><div class="ct-val" id="cx-ban">R$ 0,00</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">PIX</span><span style="font-family:var(--mo)" id="cx-pix">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Debito (liquido)</span><span style="font-family:var(--mo)" id="cx-deb">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Credito (liquido)</span><span style="font-family:var(--mo)" id="cx-cred">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Taxas descontadas</span><span style="font-family:var(--mo);color:var(--red)" id="cx-tax">R$ 0,00</span></div></div></div>
+    <div class="card"><div class="ct-lbl">Caixa Fisico (Dinheiro)</div><div class="ct-val" id="cx-fis">R$ 0,00</div><div id="cx-detalhes-fis" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Vendas dinheiro</span><span style="font-family:var(--mo)" id="cx-edin">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Pgto notinha (dinheiro)</span><span style="font-family:var(--mo)" id="cx-pnot">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Suprimentos</span><span style="font-family:var(--mo);color:var(--grn)" id="cx-supr">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Sangrias</span><span style="font-family:var(--mo);color:var(--red)" id="cx-sang">R$ 0,00</span></div></div></div>
+    <div class="card"><div class="ct-lbl">Caixa Banco (PIX + Cartao)</div><div class="ct-val" id="cx-ban">R$ 0,00</div><div id="cx-detalhes-ban" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">PIX</span><span style="font-family:var(--mo)" id="cx-pix">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Debito (liquido)</span><span style="font-family:var(--mo)" id="cx-deb">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Credito (liquido)</span><span style="font-family:var(--mo)" id="cx-cred">R$ 0,00</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Taxas descontadas</span><span style="font-family:var(--mo);color:var(--red)" id="cx-tax">R$ 0,00</span></div></div></div>
   </div>
   <div class="tw"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Descricao</th><th>Pagto</th><th>Valor Bruto</th><th>Valor Liquido</th></tr></thead><tbody id="cx-tb"></tbody></table></div>
 </div>
@@ -343,6 +349,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let CU=null, PC=[], PRC=[], CFG={taxa_debito:1.5,taxa_credito:3,valor_bonificacao_padrao:100};
+const isAdmin=()=>CU&&CU.admin===true;
 let CPID=null, CPNM=null, CXTIPO='sangria', PFILTRO='todos';
 
 const fmt=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
@@ -413,22 +420,31 @@ async function doLogin(){
   if(uid==='__first__'){
     if(pin.length<4){err.textContent='PIN minimo 4 digitos.';err.style.display='block';return;}
     const ph=await hashPIN(pin);
-    const ref=await db.collection('secretarias').add({nome:'Administrador',pin_hash:ph,ativo:true,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
+    const ref=await db.collection('secretarias').add({nome:'Administrador',pin_hash:ph,ativo:true,admin:true,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
     await db.collection('configuracoes').doc('geral').set({taxa_debito:1.5,taxa_credito:3.0,valor_bonificacao_padrao:100});
-    CU={id:ref.id,nome:'Administrador'};entrarApp();return;
+    CU={id:ref.id,nome:'Administrador',admin:true};entrarApp();return;
   }
   const doc=await db.collection('secretarias').doc(uid).get();
   if(!doc.exists){err.textContent='Usuario nao encontrado.';err.style.display='block';return;}
   const ph=await hashPIN(pin);
   if(doc.data().pin_hash!==ph){err.textContent='PIN incorreto.';err.style.display='block';document.getElementById('lo-pin').value='';return;}
-  CU={id:uid,nome:doc.data().nome};entrarApp();
+  CU={id:uid,nome:doc.data().nome,admin:doc.data().admin===true};entrarApp();
 }
 document.getElementById('lo-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 function entrarApp(){
   document.getElementById('lo').style.display='none';document.getElementById('app').style.display='block';
   document.getElementById('sb-nm').textContent=CU.nome;document.getElementById('sb-av').textContent=CU.nome[0].toUpperCase();
+  aplicarPermissoes();
   setDatas();updateDate();setInterval(updateDate,60000);loadCaches();loadCfg();loadDashboard();
+}
+function aplicarPermissoes(){
+  const admin=isAdmin();
+  // Nav items only for admin
+  ['nav-posicao','nav-exportar','nav-cfg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=admin?'':'none';});
+  // Caixa: hide detail lines and sangria/suprimento for secretarias
+  ['cx-detalhes-fis','cx-detalhes-ban'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=admin?'':'none';});
+  document.getElementById('cx-acoes') && (document.getElementById('cx-acoes').style.display=admin?'':'none');
 }
 function doLogout(){CU=null;PC=[];PRC=[];document.getElementById('app').style.display='none';document.getElementById('lo').style.display='flex';document.getElementById('lo-pin').value='';loadLoginUsers();}
 function updateDate(){document.getElementById('tb-dt').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});}
@@ -505,47 +521,73 @@ function selP(p,pref){
 }
 function clrP(pref){document.getElementById(pref+'-pid').value='';document.getElementById(pref+'-psel').style.display='none';if(pref==='v'){document.getElementById('v-prc').value='';document.getElementById('v-tot').textContent='R$ 0,00';}}
 
+let CARRINHO=[];
 async function loadVendaForm(){
   await loadCaches();
-  ['v-srch','v-prc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('v-pid').value='';document.getElementById('v-psel').style.display='none';document.getElementById('v-psr').style.display='none';
-  document.getElementById('v-qtd').value=1;document.getElementById('v-tot').textContent='R$ 0,00';document.getElementById('v-taxa').textContent='';
+  CARRINHO=[];renderCarrinho();
+  document.getElementById('v-tot').textContent='R$ 0,00';document.getElementById('v-taxa').textContent='';
   document.querySelectorAll('input[name="v-tipo"]')[0].checked=true;switchTipo();
   const sel=document.getElementById('v-prof');sel.innerHTML='<option value="">Selecione...</option>';
   PRC.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.nome+(p.saldo_devedor>0?' - deve '+fmt(p.saldo_devedor):'');sel.appendChild(o);});
 }
-function switchTipo(){const t=document.querySelector('input[name="v-tipo"]:checked').value;document.getElementById('v-pag-blk').style.display=t==='paciente'?'block':'none';document.getElementById('v-prof-blk').style.display=t==='profissional'?'block':'none';calcV();}
-function switchPgtoprof(){const v=document.querySelector('input[name="v-pgto-prof"]:checked').value;document.getElementById('v-prof-pag').style.display=v==='agora'?'block':'none';calcV();}
-function calcV(){
-  const pid=document.getElementById('v-pid').value;const p=PC.find(x=>x.id===pid);if(!p)return;
-  const qtd=parseInt(document.getElementById('v-qtd').value)||1;const tot=p.preco_venda*qtd;
+function switchTipo(){const t=document.querySelector('input[name="v-tipo"]:checked').value;document.getElementById('v-pag-blk').style.display=t==='paciente'?'block':'none';document.getElementById('v-prof-blk').style.display=t==='profissional'?'block':'none';calcCarrinho();}
+function switchPgtoprof(){const v=document.querySelector('input[name="v-pgto-prof"]:checked').value;document.getElementById('v-prof-pag').style.display=v==='agora'?'block':'none';calcCarrinho();}
+function addItemCarrinho(){
+  const div=document.createElement('div');div.className='carrinho-item';div.style.cssText='display:flex;gap:8px;align-items:center;padding:10px;background:var(--surf2);border-radius:8px;border:1px solid var(--bdr)';
+  const idx=CARRINHO.length;CARRINHO.push({pid:'',pnm:'',grupo:'',preco:0,qtd:1});
+  div.innerHTML='<div class="p-wrap" style="flex:1;position:relative"><input type="text" class="fc" placeholder="Buscar produto..." style="font-size:13px" oninput="srchPItem(this,'+idx+')"><div class="psr" id="psr-'+idx+'" style="display:none"></div></div><input type="number" min="1" value="1" class="fc" style="width:70px;font-size:13px" onchange="setQtdItem('+idx+',this.value)"><span style="font-family:var(--mo);font-size:13px;color:var(--muted);min-width:70px;text-align:right" id="item-preco-'+idx+'">R$ 0,00</span><button onclick="removeItem('+idx+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:16px;padding:0 4px">×</button>';
+  document.getElementById('v-carrinho').appendChild(div);
+}
+function srchPItem(input,idx){
+  const q=input.value.toLowerCase().trim();const res=document.getElementById('psr-'+idx);
+  if(!q){res.style.display='none';return;}
+  const mt=PC.filter(p=>p.nome.toLowerCase().includes(q)).slice(0,6);
+  if(!mt.length){res.style.display='none';return;}
+  res.style.display='block';res.innerHTML='';
+  mt.forEach(p=>{const div=document.createElement('div');div.className='psr-item';div.innerHTML='<span>'+p.nome+'</span><span style="font-family:var(--mo);color:var(--grnm)">'+fmt(p.preco_venda)+'</span>';div.onclick=()=>{CARRINHO[idx]={pid:p.id,pnm:p.nome,grupo:p.grupo,preco:p.preco_venda,qtd:CARRINHO[idx].qtd||1};input.value=p.nome;res.style.display='none';document.getElementById('item-preco-'+idx).textContent=fmt(p.preco_venda*(CARRINHO[idx].qtd||1));calcCarrinho();};res.appendChild(div);});
+}
+function setQtdItem(idx,v){CARRINHO[idx].qtd=parseInt(v)||1;if(CARRINHO[idx].preco)document.getElementById('item-preco-'+idx).textContent=fmt(CARRINHO[idx].preco*CARRINHO[idx].qtd);calcCarrinho();}
+function removeItem(idx){CARRINHO[idx]={pid:'',pnm:'',grupo:'',preco:0,qtd:1};const els=document.getElementById('v-carrinho').children;if(els[idx])els[idx].remove();calcCarrinho();}
+function renderCarrinho(){document.getElementById('v-carrinho').innerHTML='';CARRINHO=[];addItemCarrinho();}
+function calcCarrinho(){
+  const itens=CARRINHO.filter(x=>x.pid);const tot=itens.reduce((s,x)=>s+x.preco*x.qtd,0);
   document.getElementById('v-tot').textContent=fmt(tot);
   const tipo=document.querySelector('input[name="v-tipo"]:checked').value;const ti=document.getElementById('v-taxa');
   if(tipo==='paciente'){const pag=document.getElementById('v-pag').value;if(pag==='debito'){const tx=CFG.taxa_debito||0;ti.textContent='Taxa debito '+tx+'% - Liquido: '+fmt(tot*(1-tx/100));}else if(pag==='credito'){const tx=CFG.taxa_credito||0;ti.textContent='Taxa credito '+tx+'% - Liquido: '+fmt(tot*(1-tx/100));}else ti.textContent='';}
   else if(tipo==='profissional'){const pgp=document.querySelector('input[name="v-pgto-prof"]:checked');const pgtVal=pgp?pgp.value:'notinha';if(pgtVal==='agora'){const pag=document.getElementById('v-pag-prof').value;if(pag==='debito'){const tx=CFG.taxa_debito||0;ti.textContent='Taxa debito '+tx+'% - Liquido: '+fmt(tot*(1-tx/100));}else if(pag==='credito'){const tx=CFG.taxa_credito||0;ti.textContent='Taxa credito '+tx+'% - Liquido: '+fmt(tot*(1-tx/100));}else ti.textContent='';}else ti.textContent='Sera lancado na notinha do profissional';}
 }
+function calcV(){calcCarrinho();}
 async function confirmarVenda(){
-  const pid=document.getElementById('v-pid').value;const p=PC.find(x=>x.id===pid);if(!p){toast('Selecione um produto.','ko');return;}
-  const qtd=parseInt(document.getElementById('v-qtd').value)||1;const tipo=document.querySelector('input[name="v-tipo"]:checked').value;const tot=p.preco_venda*qtd;
-  const base={produto_id:p.id,produto_nome:p.nome,produto_grupo:p.grupo,quantidade:qtd,preco_unitario:p.preco_venda,valor_total:tot,secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null};
+  const itens=CARRINHO.filter(x=>x.pid);if(!itens.length){toast('Adicione pelo menos um produto.','ko');return;}
+  const tipo=document.querySelector('input[name="v-tipo"]:checked').value;
+  const tot=itens.reduce((s,x)=>s+x.preco*x.qtd,0);
   if(tipo==='paciente'){
     const pag=document.getElementById('v-pag').value;let tx=0,liq=tot;
     if(pag==='debito'){tx=tot*(CFG.taxa_debito||0)/100;liq=tot-tx;}if(pag==='credito'){tx=tot*(CFG.taxa_credito||0)/100;liq=tot-tx;}
-    await db.collection('movimentacoes').add({...base,tipo:'venda_paciente',cliente_tipo:'paciente',forma_pagamento:pag,valor_liquido:liq,taxa_valor:tx,profissional_id:null,profissional_nome:null});
+    const batch=db.batch();
+    itens.forEach(item=>{
+      const ref=db.collection('movimentacoes').doc();
+      batch.set(ref,{tipo:'venda_paciente',cliente_tipo:'paciente',produto_id:item.pid,produto_nome:item.pnm,produto_grupo:item.grupo,quantidade:item.qtd,preco_unitario:item.preco,valor_total:item.preco*item.qtd,valor_liquido:(item.preco*item.qtd)*(liq/tot),taxa_valor:(item.preco*item.qtd)*(tx/tot),forma_pagamento:pag,profissional_id:null,profissional_nome:null,secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+      const pRef=db.collection('produtos').doc(item.pid);batch.update(pRef,{estoque_atual:firebase.firestore.FieldValue.increment(-item.qtd)});
+    });
+    await batch.commit();
   }else{
     const profId=document.getElementById('v-prof').value;const prof=PRC.find(x=>x.id===profId);if(!profId||!prof){toast('Selecione o profissional.','ko');return;}
     const pgpEl=document.querySelector('input[name="v-pgto-prof"]:checked');const pgpVal=pgpEl?pgpEl.value:'notinha';
-    if(pgpVal==='notinha'){
-      await db.collection('movimentacoes').add({...base,tipo:'venda_profissional',cliente_tipo:'profissional',profissional_id:profId,profissional_nome:prof.nome,forma_pagamento:'notinha',valor_liquido:tot,taxa_valor:0});
-      await db.collection('profissionais').doc(profId).update({saldo_devedor:firebase.firestore.FieldValue.increment(tot)});
-    }else{
-      const pag=document.getElementById('v-pag-prof').value;let tx=0,liq=tot;
-      if(pag==='debito'){tx=tot*(CFG.taxa_debito||0)/100;liq=tot-tx;}if(pag==='credito'){tx=tot*(CFG.taxa_credito||0)/100;liq=tot-tx;}
-      await db.collection('movimentacoes').add({...base,tipo:'venda_paciente',cliente_tipo:'profissional',profissional_id:profId,profissional_nome:prof.nome,forma_pagamento:pag,valor_liquido:liq,taxa_valor:tx,descricao:'Venda p/ profissional (pago na hora)'});
-    }
+    const batch=db.batch();
+    itens.forEach(item=>{
+      const ref=db.collection('movimentacoes').doc();const vt=item.preco*item.qtd;
+      if(pgpVal==='notinha'){
+        batch.set(ref,{tipo:'venda_profissional',cliente_tipo:'profissional',produto_id:item.pid,produto_nome:item.pnm,produto_grupo:item.grupo,quantidade:item.qtd,preco_unitario:item.preco,valor_total:vt,valor_liquido:vt,taxa_valor:0,forma_pagamento:'notinha',profissional_id:profId,profissional_nome:prof.nome,secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+      }else{
+        const pag=document.getElementById('v-pag-prof').value;let tx=0,liq=vt;if(pag==='debito'){tx=vt*(CFG.taxa_debito||0)/100;liq=vt-tx;}if(pag==='credito'){tx=vt*(CFG.taxa_credito||0)/100;liq=vt-tx;}
+        batch.set(ref,{tipo:'venda_paciente',cliente_tipo:'profissional',produto_id:item.pid,produto_nome:item.pnm,produto_grupo:item.grupo,quantidade:item.qtd,preco_unitario:item.preco,valor_total:vt,valor_liquido:liq,taxa_valor:tx,forma_pagamento:pag,profissional_id:profId,profissional_nome:prof.nome,secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+      }
+      const pRef=db.collection('produtos').doc(item.pid);batch.update(pRef,{estoque_atual:firebase.firestore.FieldValue.increment(-item.qtd)});
+    });
+    if(pgpVal==='notinha'){batch.update(db.collection('profissionais').doc(profId),{saldo_devedor:firebase.firestore.FieldValue.increment(tot)});}
+    await batch.commit();
   }
-  // Decrement stock
-  await db.collection('produtos').doc(pid).update({estoque_atual:firebase.firestore.FieldValue.increment(-qtd)});
   toast('Venda registrada! '+fmt(tot),'ok');await loadCaches();loadVendaForm();
 }
 
@@ -734,7 +776,7 @@ function abrirSec(){document.getElementById('ms-nm').value='';document.getElemen
 async function salvarSec(){
   const nm=document.getElementById('ms-nm').value.trim();const p1=document.getElementById('ms-pin').value;const p2=document.getElementById('ms-pin2').value;
   if(!nm){toast('Informe o nome.','ko');return;}if(p1.length<4){toast('PIN minimo 4 digitos.','ko');return;}if(p1!==p2){toast('PINs nao conferem.','ko');return;}
-  const ph=await hashPIN(p1);await db.collection('secretarias').add({nome:nm,pin_hash:ph,ativo:true,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
+  const ph=await hashPIN(p1);await db.collection('secretarias').add({nome:nm,pin_hash:ph,ativo:true,admin:false,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
   closeM('m-sec');toast('Secretaria adicionada!','ok');loadSecLista();loadLoginUsers();
 }
 
