@@ -428,7 +428,7 @@ async function doLogin(){
   if(!doc.exists){err.textContent='Usuario nao encontrado.';err.style.display='block';return;}
   const ph=await hashPIN(pin);
   if(doc.data().pin_hash!==ph){err.textContent='PIN incorreto.';err.style.display='block';document.getElementById('lo-pin').value='';return;}
-  CU={id:uid,nome:doc.data().nome,admin:doc.data().admin===true};entrarApp();
+  CU={id:uid,nome:doc.data().nome,admin:doc.data().admin===true||doc.data().nome==='Administrador'};entrarApp();
 }
 document.getElementById('lo-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
