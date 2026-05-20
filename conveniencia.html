@@ -454,14 +454,10 @@ function entrarApp(){
 }
 function aplicarPermissoes(){
   const admin=isAdmin();
-  ['nav-posicao','nav-exportar','nav-cfg','nav-dashboard'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=admin?'':'none';});
+  ['nav-posicao','nav-exportar','nav-cfg','nav-dashboard'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=admin?'':' none';});
   ['cx-detalhes-fis','cx-detalhes-ban'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=admin?'':'none';});
   const cxa=document.getElementById('cx-acoes');if(cxa)cxa.style.display=admin?'flex':'none';
   if(!admin)nav('venda');
-});
-  // Caixa: hide detail lines and sangria/suprimento for secretarias
-  ['cx-detalhes-fis','cx-detalhes-ban'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=admin?'':'none';});
-  document.getElementById('cx-acoes') && (document.getElementById('cx-acoes').style.display=admin?'':'none');
 }
 function doLogout(){CU=null;PC=[];PRC=[];document.getElementById('app').style.display='none';document.getElementById('lo').style.display='flex';document.getElementById('lo-pin').value='';loadLoginUsers();}
 function updateDate(){document.getElementById('tb-dt').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});}
