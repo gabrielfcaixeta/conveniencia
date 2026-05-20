@@ -769,8 +769,29 @@ async function loadHistorico(){
 }
 
 async function loadSecLista(){
-  const snap=await db.collection('secretarias').get();const div=document.getElementById('sec-lista');div.innerHTML='';
-  snap.forEach(doc=>{const s=doc.data();const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:13px';row.innerHTML='<span style="font-weight:500">'+s.nome+'</span>'+(s.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>');div.appendChild(row);});
+  const snap=await db.collection('secretarias').orderBy&&false||await db.collection('secretarias').get();
+  const div=document.getElementById('sec-lista');div.innerHTML='';
+  snap.forEach(doc=>{
+    const s={id:doc.id,...doc.data()};
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:13px;gap:8px';
+    row.innerHTML='<div style="flex:1"><div style="font-weight:600">'+s.nome+'</div><div style="font-size:11px;color:var(--muted)">'+(s.admin?'Administrador':'Secretaria')+'</div></div>'+(s.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+'<button class="btn btn-s btn-sm" onclick='editarSec('+JSON.stringify(s)+')'>Editar</button><button class="btn btn-s btn-sm" onclick="toggleSec(''+s.id+'','+s.ativo+')">'+(s.ativo?'Desativar':'Ativar')+'</button>';
+    div.appendChild(row);
+  });
+}
+async function toggleSec(id,ativo){
+  if(!confirm((ativo?'Desativar':'Ativar')+' esta secretaria?'))return;
+  await db.collection('secretarias').doc(id).update({ativo:!ativo});
+  toast((ativo?'Secretaria desativada':'Secretaria ativada')+'!','ok');
+  loadSecLista();loadLoginUsers();
+}
+function editarSec(s){
+  document.getElementById('es-id').value=s.id;
+  document.getElementById('es-nm').value=s.nome;
+  document.getElementById('es-pin').value='';
+  document.getElementById('es-pin2').value='';
+  document.getElementById('es-ttl').textContent='Editando: '+s.nome;
+  openM('m-edit-sec');
 }
 function abrirSec(){document.getElementById('ms-nm').value='';document.getElementById('ms-pin').value='';document.getElementById('ms-pin2').value='';openM('m-sec');}
 async function salvarSec(){
@@ -778,6 +799,21 @@ async function salvarSec(){
   if(!nm){toast('Informe o nome.','ko');return;}if(p1.length<4){toast('PIN minimo 4 digitos.','ko');return;}if(p1!==p2){toast('PINs nao conferem.','ko');return;}
   const ph=await hashPIN(p1);await db.collection('secretarias').add({nome:nm,pin_hash:ph,ativo:true,admin:false,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
   closeM('m-sec');toast('Secretaria adicionada!','ok');loadSecLista();loadLoginUsers();
+}
+async function salvarEditSec(){
+  const id=document.getElementById('es-id').value;
+  const nm=document.getElementById('es-nm').value.trim();
+  const p1=document.getElementById('es-pin').value;
+  const p2=document.getElementById('es-pin2').value;
+  if(!nm){toast('Informe o nome.','ko');return;}
+  const upd={nome:nm};
+  if(p1){
+    if(p1.length<4){toast('PIN minimo 4 digitos.','ko');return;}
+    if(p1!==p2){toast('PINs nao conferem.','ko');return;}
+    upd.pin_hash=await hashPIN(p1);
+  }
+  await db.collection('secretarias').doc(id).update(upd);
+  closeM('m-edit-sec');toast('Secretaria atualizada!','ok');loadSecLista();loadLoginUsers();
 }
 
 async function exportCSV(){
@@ -795,5 +831,16 @@ async function exportCSV(){
 
 loadLoginUsers();
 </script>
+
+<div class="mo" id="m-edit-sec" style="display:none"><div class="mb">
+  <div class="mh"><h3 id="es-ttl">Editar Secretaria</h3><button class="btn btn-s btn-sm" onclick="closeM('m-edit-sec')">X</button></div>
+  <div class="mbody">
+    <input type="hidden" id="es-id">
+    <div class="fg"><label class="fl">Nome</label><input type="text" class="fc" id="es-nm"></div>
+    <div class="fg"><label class="fl">Novo PIN <small style="font-weight:400;color:var(--muted)">deixe em branco para manter o atual</small></label><input type="password" class="fc" id="es-pin" maxlength="8" inputmode="numeric" placeholder="Novo PIN..."></div>
+    <div class="fg"><label class="fl">Confirmar Novo PIN</label><input type="password" class="fc" id="es-pin2" maxlength="8" inputmode="numeric" placeholder="Confirmar..."></div>
+  </div>
+  <div class="mf"><button class="btn btn-s" onclick="closeM('m-edit-sec')">Cancelar</button><button class="btn btn-p" onclick="salvarEditSec()">Salvar</button></div>
+</div></div>
 </body>
 </html>
