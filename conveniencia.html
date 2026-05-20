@@ -678,12 +678,12 @@ async function confirmarBaixaNotinha(){
 }
 function abrirBonif(){
   const lista=document.getElementById('bonif-lista');lista.innerHTML='';
-  PRC.forEach(p=>{const v=CFG.valor_bonificacao_padrao||100;const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;font-size:13px';div.innerHTML='<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500"><input type="checkbox" value="'+p.id+'" data-nm="'+p.nome+'" data-val="'+v+'" style="width:15px;height:15px"> '+p.nome+'</label><span style="font-family:var(--mo);color:var(--amb)">'+fmt(v)+'</span>';lista.appendChild(div);});
+  PRC.forEach(p=>{const v=CFG.valor_bonificacao_padrao!=null?CFG.valor_bonificacao_padrao:100;const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;font-size:13px';div.innerHTML='<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500"><input type="checkbox" value="'+p.id+'" data-nm="'+p.nome+'" data-val="'+v+'" style="width:15px;height:15px"> '+p.nome+'</label><span style="font-family:var(--mo);color:var(--amb)">'+fmt(v)+'</span>';lista.appendChild(div);});
   openM('m-bonif');
 }
 async function confirmarBonif(){
   const checks=document.querySelectorAll('#bonif-lista input[type=checkbox]:checked');if(!checks.length){toast('Nenhum profissional selecionado.','ko');return;}
-  const val=CFG.valor_bonificacao_padrao||100;
+  const val=CFG.valor_bonificacao_padrao!=null?CFG.valor_bonificacao_padrao:100;
   const batch=db.batch();
   checks.forEach(cb=>{
     const profId=cb.value,nm=cb.dataset.nm;
