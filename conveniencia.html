@@ -769,16 +769,22 @@ async function loadHistorico(){
 }
 
 async function loadSecLista(){
-  const snap=await db.collection('secretarias').orderBy&&false||await db.collection('secretarias').get();
+  const snap=await db.collection('secretarias').get();
   const div=document.getElementById('sec-lista');div.innerHTML='';
   snap.forEach(doc=>{
     const s={id:doc.id,...doc.data()};
     const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:13px;gap:8px';
-    row.innerHTML='<div style="flex:1"><div style="font-weight:600">'+s.nome+'</div><div style="font-size:11px;color:var(--muted)">'+(s.admin?'Administrador':'Secretaria')+'</div></div>'+(s.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+'<button class="btn btn-s btn-sm" onclick='editarSec('+JSON.stringify(s)+')'>Editar</button><button class="btn btn-s btn-sm" onclick="toggleSec(''+s.id+'','+s.ativo+')">'+(s.ativo?'Desativar':'Ativar')+'</button>';
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--bdr)';
+    const info=document.createElement('div');info.style.flex='1';
+    info.innerHTML='<div style="font-weight:600">'+s.nome+'</div><div style="font-size:11px;color:var(--muted)">'+(s.admin?'Administrador':'Secretaria')+'</div>';
+    const badge=document.createElement('span');badge.className=s.ativo?'bg bg-g':'bg bg-x';badge.textContent=s.ativo?'Ativo':'Inativo';
+    const be=document.createElement('button');be.className='btn btn-s btn-sm';be.textContent='Editar';be.onclick=()=>editarSec(s);
+    const bt=document.createElement('button');bt.className='btn btn-s btn-sm';bt.textContent=s.ativo?'Desativar':'Ativar';bt.onclick=()=>toggleSec(s.id,s.ativo);
+    row.appendChild(info);row.appendChild(badge);row.appendChild(be);row.appendChild(bt);
     div.appendChild(row);
   });
 }
+
 async function toggleSec(id,ativo){
   if(!confirm((ativo?'Desativar':'Ativar')+' esta secretaria?'))return;
   await db.collection('secretarias').doc(id).update({ativo:!ativo});
