@@ -798,6 +798,25 @@ async function loadProfTable(){
     tb.appendChild(tr);
   });
 }
+function abrirProf(){
+  document.getElementById('mpr-id').value='';
+  document.getElementById('mpr-ttl').textContent='Novo Profissional';
+  document.getElementById('mpr-nm').value='';
+  document.getElementById('mpr-bonif').value=CFG.valor_bonificacao_padrao!=null?CFG.valor_bonificacao_padrao:100;
+  document.getElementById('mpr-saldo-blk').style.display='none';
+  document.getElementById('mpr-saldo').value='';
+  openM('m-prof');
+}
+function editProf(p){
+  document.getElementById('mpr-id').value=p.id;
+  document.getElementById('mpr-ttl').textContent='Editar: '+p.nome;
+  document.getElementById('mpr-nm').value=p.nome;
+  const bonif=p.bonificacao_mensal!=null?p.bonificacao_mensal:(CFG.valor_bonificacao_padrao!=null?CFG.valor_bonificacao_padrao:100);
+  document.getElementById('mpr-bonif').value=bonif;
+  document.getElementById('mpr-saldo-blk').style.display='block';
+  document.getElementById('mpr-saldo').value=p.saldo_devedor||0;
+  openM('m-prof');
+}
 async function salvarProf(){
   const id=document.getElementById('mpr-id').value;const nm=document.getElementById('mpr-nm').value.trim();if(!nm){toast('Informe o nome.','ko');return;}
   const bonif=parseFloat(document.getElementById('mpr-bonif').value)||0;
