@@ -265,8 +265,8 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
 
 <!-- PROFISSIONAIS -->
 <div class="sec" id="s-profissionais">
-  <div class="sh"><h2>Profissionais</h2><button class="btn btn-p btn-sm" onclick="abrirProf()">+ Novo Profissional</button></div>
-  <div class="tw"><table><thead><tr><th>Nome</th><th>Saldo Devedor</th><th>Bonificacao/Mes</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="pr-tb"></tbody></table></div>
+  <div class="sh"><h2>Profissionais</h2><div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="abrirBaixaNotinha()">💰 Baixa em Notinha</button><button class="btn btn-a btn-sm" onclick="abrirBonif()">🎁 Bonificacao Mensal</button><button class="btn btn-p btn-sm" onclick="abrirProf()">+ Novo Profissional</button></div></div>
+  <div class="tw"><table><thead><tr><th>Nome</th><th>Saldo Devedor</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="pr-tb"></tbody></table></div>
 </div>
 
 <!-- HISTORICO -->
@@ -274,7 +274,7 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
   <div class="sh"><h2>Historico de Lancamentos</h2></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <input type="date" class="fc" id="h-ini" style="width:148px"><span style="color:var(--muted)">ate</span><input type="date" class="fc" id="h-fim" style="width:148px">
-    <select class="fc" id="h-tipo" style="width:200px"><option value="">Todos os tipos</option><option value="venda_paciente">Venda - Paciente</option><option value="venda_profissional">Venda - Notinha</option><option value="entrada_estoque">Entrada de Estoque</option><option value="pagamento_notinha">Pagamento Notinha</option><option value="bonificacao">Bonificacao</option><option value="sangria">Sangria</option><option value="suprimento">Suprimento</option></select>
+    <select class="fc" id="h-tipo" style="width:200px"><option value="">Todos os tipos</option><option value="venda_paciente">Venda - Paciente</option><option value="venda_profissional">Venda - Notinha</option><option value="entrada_estoque">Entrada de Estoque</option><option value="pagamento_notinha">Pagamento Notinha</option><option value="bonificacao">Bonificacao</option><option value="pagamento_notinha">Pagamento Notinha</option><option value="edicao_profissional">Edicao de Profissional</option><option value="sangria">Sangria</option><option value="suprimento">Suprimento</option></select>
     <button class="btn btn-s btn-sm" onclick="loadHistorico()">Filtrar</button>
   </div>
   <div class="tw"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Produto/Desc.</th><th>Cliente</th><th>Pagto</th><th>Valor</th><th>Secretaria</th><th>Situacao</th></tr></thead><tbody id="h-tb"></tbody></table></div>
@@ -313,7 +313,7 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
 
 <div class="mo" id="m-prod" style="display:none"><div class="mb"><div class="mh"><h3 id="mp-ttl">Novo Produto</h3><button class="btn btn-s btn-sm" onclick="closeM('m-prod')">X</button></div><div class="mbody"><input type="hidden" id="mp-id"><div class="fg"><label class="fl">Nome</label><input type="text" class="fc" id="mp-nm"></div><div class="fr"><div class="fg"><label class="fl">Grupo</label><select class="fc" id="mp-gr"><option value="conveniencia">Conveniencia</option><option value="livraria">Livraria</option></select></div><div class="fg"><label class="fl">Unidade</label><input type="text" class="fc" id="mp-un" placeholder="un, cx, kg..."></div></div><div class="fr"><div class="fg"><label class="fl">Preco de Custo (R$)</label><input type="number" class="fc" id="mp-cst" step="0.01" min="0" placeholder="0,00"></div><div class="fg"><label class="fl">Preco de Venda (R$)</label><input type="number" class="fc" id="mp-prc" step="0.01" min="0" placeholder="0,00"></div></div></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-prod')">Cancelar</button><button class="btn btn-p" onclick="salvarProd()">Salvar</button></div></div></div>
 
-<div class="mo" id="m-prof" style="display:none"><div class="mb"><div class="mh"><h3 id="mpr-ttl">Novo Profissional</h3><button class="btn btn-s btn-sm" onclick="closeM('m-prof')">X</button></div><div class="mbody"><input type="hidden" id="mpr-id"><div class="fg"><label class="fl">Nome</label><input type="text" class="fc" id="mpr-nm"></div><div class="fg"><label class="fl">Bonificacao Mensal (R$)</label><input type="number" class="fc" id="mpr-bonif" step="1" min="0" placeholder="100"></div></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-prof')">Cancelar</button><button class="btn btn-p" onclick="salvarProf()">Salvar</button></div></div></div>
+<div class="mo" id="m-prof" style="display:none"><div class="mb"><div class="mh"><h3 id="mpr-ttl">Novo Profissional</h3><button class="btn btn-s btn-sm" onclick="closeM('m-prof')">X</button></div><div class="mbody"><input type="hidden" id="mpr-id"><div class="fg"><label class="fl">Nome</label><input type="text" class="fc" id="mpr-nm"></div></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-prof')">Cancelar</button><button class="btn btn-p" onclick="salvarProf()">Salvar</button></div></div></div>
 
 <div class="mo" id="m-sec" style="display:none"><div class="mb"><div class="mh"><h3>Nova Secretaria</h3><button class="btn btn-s btn-sm" onclick="closeM('m-sec')">X</button></div><div class="mbody"><div class="fg"><label class="fl">Nome</label><input type="text" class="fc" id="ms-nm"></div><div class="fg"><label class="fl">PIN (4-8 numeros)</label><input type="password" class="fc" id="ms-pin" maxlength="8" inputmode="numeric" placeholder="****"></div><div class="fg"><label class="fl">Confirmar PIN</label><input type="password" class="fc" id="ms-pin2" maxlength="8" inputmode="numeric" placeholder="****"></div></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-sec')">Cancelar</button><button class="btn btn-p" onclick="salvarSec()">Salvar</button></div></div></div>
 
@@ -363,7 +363,7 @@ async function hashPIN(p){const e=new TextEncoder().encode(p);const b=await cryp
 const closeM=id=>document.getElementById(id).style.display='none';
 const openM=id=>document.getElementById(id).style.display='flex';
 function toast(msg,tp=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(tp?' '+tp:'');setTimeout(()=>t.classList.remove('show'),3200);}
-function tipoBadge(t){const m={venda_paciente:'<span class="bg bg-g">Venda Pac.</span>',venda_profissional:'<span class="bg bg-b">Notinha</span>',entrada_estoque:'<span class="bg bg-p">Estoque</span>',pagamento_notinha:'<span class="bg bg-g">Pagamento</span>',bonificacao:'<span class="bg bg-a">Bonificacao</span>',sangria:'<span class="bg bg-r">Sangria</span>',suprimento:'<span class="bg bg-g">Suprimento</span>'};return m[t]||('<span class="bg bg-x">'+t+'</span>');}
+function tipoBadge(t){const m={venda_paciente:'<span class="bg bg-g">Venda Pac.</span>',venda_profissional:'<span class="bg bg-b">Notinha</span>',entrada_estoque:'<span class="bg bg-p">Estoque</span>',pagamento_notinha:'<span class="bg bg-g">Pagamento</span>',bonificacao:'<span class="bg bg-a">Bonificacao</span>',sangria:'<span class="bg bg-r">Sangria</span>',suprimento:'<span class="bg bg-g">Suprimento</span>',edicao_profissional:'<span class="bg bg-x">Edicao</span>'};return m[t]||('<span class="bg bg-x">'+t+'</span>');}
 function pagBadge(p){if(!p)return'<span style="color:var(--muted)">-</span>';const m={dinheiro:'Dinheiro',pix:'PIX',debito:'Debito',credito:'Credito',notinha:'Notinha'};return m[p]||p;}
 
 function gerarLink(profId){
@@ -658,16 +658,40 @@ async function confirmarPgto(){
   closeM('m-pgto');await loadCaches();toast('Pagamento registrado!','ok');abrirDetNot(CPID,CPNM);
 }
 
+function abrirBaixaNotinha(){
+  const sel=document.getElementById('baixa-prof');sel.innerHTML='<option value="">Selecione...</option>';
+  PRC.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.nome+(p.saldo_devedor>0?' — deve '+fmt(p.saldo_devedor):'');sel.appendChild(o);});
+  document.getElementById('baixa-val').value='';document.getElementById('baixa-obs').value='';
+  document.getElementById('baixa-saldo-info').style.display='none';
+  sel.onchange=()=>{const p=PRC.find(x=>x.id===sel.value);const info=document.getElementById('baixa-saldo-info');if(p&&p.saldo_devedor>0){info.textContent='Saldo devedor: '+fmt(p.saldo_devedor);info.style.display='block';}else info.style.display='none';};
+  openM('m-baixa');
+}
+async function confirmarBaixaNotinha(){
+  const profId=document.getElementById('baixa-prof').value;const prof=PRC.find(x=>x.id===profId);
+  if(!profId||!prof){toast('Selecione o profissional.','ko');return;}
+  const val=parseFloat(document.getElementById('baixa-val').value)||0;if(val<=0){toast('Informe um valor valido.','ko');return;}
+  const pag=document.getElementById('baixa-pag').value;const obs=document.getElementById('baixa-obs').value.trim();
+  let tx=0,liq=val;if(pag==='debito'){tx=val*(CFG.taxa_debito||0)/100;liq=val-tx;}if(pag==='credito'){tx=val*(CFG.taxa_credito||0)/100;liq=val-tx;}
+  await db.collection('movimentacoes').add({tipo:'pagamento_notinha',profissional_id:profId,profissional_nome:prof.nome,descricao:'Pagamento de notinha'+(obs?' — '+obs:''),valor_total:val,valor_liquido:liq,taxa_valor:tx,forma_pagamento:pag,quantidade:null,produto_id:null,produto_nome:null,produto_grupo:null,preco_unitario:null,cliente_tipo:'profissional',secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+  await db.collection('profissionais').doc(profId).update({saldo_devedor:firebase.firestore.FieldValue.increment(-val)});
+  closeM('m-baixa');await loadCaches();toast('Pagamento de '+fmt(val)+' registrado!','ok');loadProfTable();
+}
 function abrirBonif(){
   const lista=document.getElementById('bonif-lista');lista.innerHTML='';
-  PRC.forEach(p=>{const v=p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100;const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;font-size:13px';div.innerHTML='<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500"><input type="checkbox" value="'+p.id+'" data-nm="'+p.nome+'" data-val="'+v+'" style="width:15px;height:15px"> '+p.nome+'</label><span style="font-family:var(--mo);color:var(--amb)">'+fmt(v)+'</span>';lista.appendChild(div);});
+  PRC.forEach(p=>{const v=CFG.valor_bonificacao_padrao||100;const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;font-size:13px';div.innerHTML='<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500"><input type="checkbox" value="'+p.id+'" data-nm="'+p.nome+'" data-val="'+v+'" style="width:15px;height:15px"> '+p.nome+'</label><span style="font-family:var(--mo);color:var(--amb)">'+fmt(v)+'</span>';lista.appendChild(div);});
   openM('m-bonif');
 }
 async function confirmarBonif(){
   const checks=document.querySelectorAll('#bonif-lista input[type=checkbox]:checked');if(!checks.length){toast('Nenhum profissional selecionado.','ko');return;}
+  const val=CFG.valor_bonificacao_padrao||100;
   const batch=db.batch();
-  checks.forEach(cb=>{const profId=cb.value,nm=cb.dataset.nm,val=parseFloat(cb.dataset.val)||100;const ref=db.collection('movimentacoes').doc();batch.set(ref,{tipo:'bonificacao',profissional_id:profId,profissional_nome:nm,descricao:'Bonificacao mensal',valor_total:val,valor_liquido:val,taxa_valor:0,forma_pagamento:'dinheiro',quantidade:null,produto_id:null,produto_nome:null,produto_grupo:null,preco_unitario:null,cliente_tipo:'profissional',secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});const pRef=db.collection('profissionais').doc(profId);batch.update(pRef,{saldo_devedor:firebase.firestore.FieldValue.increment(-val)});});
-  await batch.commit();closeM('m-bonif');await loadCaches();toast('Bonificacoes aplicadas!','ok');loadNotinhas();
+  checks.forEach(cb=>{
+    const profId=cb.value,nm=cb.dataset.nm;
+    const ref=db.collection('movimentacoes').doc();
+    batch.set(ref,{tipo:'bonificacao',profissional_id:profId,profissional_nome:nm,descricao:'Bonificacao mensal — R$ '+val.toFixed(2),valor_total:val,valor_liquido:val,taxa_valor:0,forma_pagamento:null,quantidade:null,produto_id:null,produto_nome:null,produto_grupo:null,preco_unitario:null,cliente_tipo:'profissional',secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+    batch.update(db.collection('profissionais').doc(profId),{saldo_devedor:firebase.firestore.FieldValue.increment(-val)});
+  });
+  await batch.commit();closeM('m-bonif');await loadCaches();toast('Bonificacoes aplicadas!','ok');loadProfTable();
 }
 
 function abrirRel(){document.getElementById('rel-ini').value=firstISO();document.getElementById('rel-fim').value=todayISO();document.getElementById('rel-txt').value='';openM('m-rel');}
@@ -746,18 +770,42 @@ async function toggleProd(id,ativo){await db.collection('produtos').doc(id).upda
 
 async function loadProfTable(){
   const snap=await db.collection('profissionais').get();const tb=document.getElementById('pr-tb');tb.innerHTML='';
-  if(snap.empty){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Nenhum profissional cadastrado</td></tr>';return;}
-  snap.forEach(doc=>{const p={id:doc.id,...doc.data()};const sd=p.saldo_devedor||0;const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:500">'+p.nome+'</td><td style="font-family:var(--mo);color:'+(sd>0?'var(--red)':sd<0?'var(--grn)':'var(--muted)')+'">'+( sd>0?fmt(sd):sd<0?'Credito '+fmt(Math.abs(sd)):'Em dia')+'</td><td style="font-family:var(--mo)">'+fmt(p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100)+'</td><td>'+(p.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+'</td><td style="display:flex;gap:6px"><button class="btn btn-s btn-sm" onclick=\'editProf('+JSON.stringify(p)+')\'>Editar</button><button class="btn btn-s btn-sm" onclick="toggleProf(\''+p.id+'\','+p.ativo+')">'+(p.ativo?'Desativar':'Ativar')+'</button></td>';tb.appendChild(tr);});
+  if(snap.empty){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Nenhum profissional cadastrado</td></tr>';return;}
+  const docs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.nome.localeCompare(b.nome));
+  docs.forEach(p=>{
+    const sd=p.saldo_devedor||0;const tr=document.createElement('tr');
+    const sdTxt=sd>0?fmt(sd):sd<0?'Credito '+fmt(Math.abs(sd)):'Em dia';
+    const sdClr=sd>0?'var(--red)':sd<0?'var(--grn)':'var(--muted)';
+    const be=document.createElement('button');be.className='btn btn-s btn-sm';be.textContent='Editar';be.onclick=()=>editProf(p);
+    const bt=document.createElement('button');bt.className='btn btn-s btn-sm';bt.textContent=p.ativo?'Desativar':'Ativar';bt.onclick=()=>toggleProf(p.id,p.ativo);
+    tr.innerHTML='<td style="font-weight:500">'+p.nome+'</td><td style="font-family:var(--mo);color:'+sdClr+'">'+sdTxt+'</td><td>'+(p.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+'</td><td></td>';
+    tr.querySelector('td:last-child').style.cssText='display:flex;gap:6px';
+    tr.querySelector('td:last-child').appendChild(be);tr.querySelector('td:last-child').appendChild(bt);
+    tb.appendChild(tr);
+  });
 }
-function abrirProf(){document.getElementById('mpr-id').value='';document.getElementById('mpr-ttl').textContent='Novo Profissional';document.getElementById('mpr-nm').value='';document.getElementById('mpr-bonif').value=CFG.valor_bonificacao_padrao||100;openM('m-prof');}
-function editProf(p){document.getElementById('mpr-id').value=p.id;document.getElementById('mpr-ttl').textContent='Editar Profissional';document.getElementById('mpr-nm').value=p.nome;document.getElementById('mpr-bonif').value=p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100;openM('m-prof');}
+function abrirProf(){document.getElementById('mpr-id').value='';document.getElementById('mpr-ttl').textContent='Novo Profissional';document.getElementById('mpr-nm').value='';openM('m-prof');}
+function editProf(p){document.getElementById('mpr-id').value=p.id;document.getElementById('mpr-ttl').textContent='Editar: '+p.nome;document.getElementById('mpr-nm').value=p.nome;openM('m-prof');}
 async function salvarProf(){
   const id=document.getElementById('mpr-id').value;const nm=document.getElementById('mpr-nm').value.trim();if(!nm){toast('Informe o nome.','ko');return;}
-  const data={nome:nm,bonificacao_mensal:parseFloat(document.getElementById('mpr-bonif').value)||0,ativo:true};
-  if(id)await db.collection('profissionais').doc(id).update(data);else await db.collection('profissionais').add({...data,saldo_devedor:0,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
+  if(id){
+    const before=PRC.find(x=>x.id===id);
+    await db.collection('profissionais').doc(id).update({nome:nm});
+    // Log edit in historico
+    if(before&&before.nome!==nm){
+      await db.collection('movimentacoes').add({tipo:'edicao_profissional',descricao:'Nome alterado de "'+before.nome+'" para "'+nm+'"',profissional_id:id,profissional_nome:nm,valor_total:0,valor_liquido:0,taxa_valor:0,forma_pagamento:null,produto_id:null,produto_nome:null,produto_grupo:null,quantidade:null,preco_unitario:null,cliente_tipo:null,secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+    }
+  }else{
+    await db.collection('profissionais').add({nome:nm,saldo_devedor:0,ativo:true,criado_em:firebase.firestore.FieldValue.serverTimestamp()});
+  }
   closeM('m-prof');await loadCaches();toast('Profissional salvo!','ok');loadProfTable();
 }
-async function toggleProf(id,ativo){await db.collection('profissionais').doc(id).update({ativo:!ativo});await loadCaches();loadProfTable();}
+async function toggleProf(id,ativo){
+  const p=PRC.find(x=>x.id===id)||{nome:'Profissional'};
+  await db.collection('profissionais').doc(id).update({ativo:!ativo});
+  await db.collection('movimentacoes').add({tipo:'edicao_profissional',descricao:(ativo?'Profissional desativado':'Profissional reativado')+': '+p.nome,profissional_id:id,profissional_nome:p.nome,valor_total:0,valor_liquido:0,taxa_valor:0,forma_pagamento:null,produto_id:null,produto_nome:null,produto_grupo:null,quantidade:null,preco_unitario:null,cliente_tipo:null,secretaria_id:CU.id,secretaria_nome:CU.nome,timestamp:firebase.firestore.FieldValue.serverTimestamp(),marcado_erro:false,motivo_erro:null});
+  await loadCaches();loadProfTable();
+}
 
 async function loadHistorico(){
   const ini=new Date(document.getElementById('h-ini').value+'T00:00:00');const fim=new Date(document.getElementById('h-fim').value+'T23:59:59');const tipo=document.getElementById('h-tipo').value;
@@ -847,6 +895,25 @@ loadLoginUsers();
     <div class="fg"><label class="fl">Confirmar Novo PIN</label><input type="password" class="fc" id="es-pin2" maxlength="8" inputmode="numeric" placeholder="Confirmar..."></div>
   </div>
   <div class="mf"><button class="btn btn-s" onclick="closeM('m-edit-sec')">Cancelar</button><button class="btn btn-p" onclick="salvarEditSec()">Salvar</button></div>
+</div></div>
+
+<div class="mo" id="m-baixa" style="display:none"><div class="mb">
+  <div class="mh"><h3>💰 Baixa em Notinha</h3><button class="btn btn-s btn-sm" onclick="closeM('m-baixa')">X</button></div>
+  <div class="mbody">
+    <div class="fg"><label class="fl">Profissional</label><select class="fc" id="baixa-prof"><option value="">Selecione...</option></select></div>
+    <div class="fg" id="baixa-saldo-info" style="display:none;padding:10px 12px;background:var(--redl);border-radius:6px;font-size:13px;color:var(--red)"></div>
+    <div class="fg"><label class="fl">Valor Pago (R$)</label><input type="number" class="fc" id="baixa-val" step="0.01" min="0.01" placeholder="0,00"></div>
+    <div class="fg"><label class="fl">Forma de Pagamento</label>
+      <select class="fc" id="baixa-pag">
+        <option value="dinheiro">💵 Dinheiro</option>
+        <option value="pix">⚡ PIX</option>
+        <option value="debito">💳 Cartao Debito</option>
+        <option value="credito">💳 Cartao Credito</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Observacao <small style="font-weight:400;color:var(--muted)">opcional</small></label><input type="text" class="fc" id="baixa-obs" placeholder="Ex: pagamento parcial, cheque..."></div>
+  </div>
+  <div class="mf"><button class="btn btn-s" onclick="closeM('m-baixa')">Cancelar</button><button class="btn btn-p" onclick="confirmarBaixaNotinha()">Confirmar Pagamento</button></div>
 </div></div>
 </body>
 </html>
