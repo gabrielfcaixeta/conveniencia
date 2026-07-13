@@ -239,7 +239,7 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
   <div id="not-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
   <div id="not-det" style="display:none">
     <button class="btn btn-s btn-sm" style="margin-bottom:14px" onclick="voltarNot()">Voltar</button>
-    <div class="sh"><h3 style="font-size:16px;font-weight:700" id="nd-nm">-</h3><button class="btn btn-s btn-sm" onclick="abrirPgto()">Registrar Pagamento</button></div>
+    <div class="sh"><h3 style="font-size:16px;font-weight:700" id="nd-nm">-</h3><div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="abrirRel()">Extrato do Periodo</button><button class="btn btn-s btn-sm" onclick="abrirPgto()">Registrar Pagamento</button></div></div>
     <div class="g3" style="margin-bottom:18px"><div class="card"><div class="ct-lbl">Saldo Devedor</div><div class="ct-val" id="nd-sd" style="color:var(--red)">R$ 0,00</div></div><div class="card"><div class="ct-lbl">Total Compras</div><div class="ct-val" id="nd-cp">R$ 0,00</div></div><div class="card"><div class="ct-lbl">Total Pago</div><div class="ct-val" id="nd-pg" style="color:var(--grn)">R$ 0,00</div></div></div>
     <div class="tw"><table><thead><tr><th>Data/Hora</th><th>Produto/Desc.</th><th>Qtd</th><th>Valor</th><th>Tipo</th><th>Secretaria</th><th>Acao</th></tr></thead><tbody id="nd-tb"></tbody></table></div>
   </div>
@@ -339,7 +339,7 @@ tr.err-row td:not(:last-child){opacity:.4;text-decoration:line-through}
 
 <div class="mo" id="m-err" style="display:none"><div class="mb"><div class="mh"><h3>Marcar como Erro</h3><button class="btn btn-s btn-sm" onclick="closeM('m-err')">X</button></div><div class="mbody"><p style="font-size:13px;color:var(--txt2);margin-bottom:14px">O lancamento continuara registrado, mas sera retirado dos calculos.</p><div class="fg"><label class="fl">Motivo (obrigatorio)</label><input type="text" class="fc" id="merr-mot" placeholder="Descreva o erro..."></div><input type="hidden" id="merr-id"></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-err')">Cancelar</button><button class="btn btn-d" onclick="confirmarErro()">Marcar como Erro</button></div></div></div>
 
-<div class="mo" id="m-rel" style="display:none"><div class="mb mb-wide"><div class="mh"><h3>Relatorio Semanal - Notinhas</h3><button class="btn btn-s btn-sm" onclick="closeM('m-rel')">X</button></div><div class="mbody"><div class="fr" style="margin-bottom:12px"><div><label class="fl">De</label><input type="date" class="fc" id="rel-ini"></div><div><label class="fl">Ate</label><input type="date" class="fc" id="rel-fim"></div></div><button class="btn btn-s btn-sm" style="margin-bottom:12px" onclick="gerarRel()">Gerar Relatorio</button><textarea id="rel-txt" readonly style="width:100%;height:260px;font-family:var(--mo);font-size:12px;border:1px solid var(--bdr);border-radius:6px;padding:12px;resize:none;outline:none;line-height:1.8;background:var(--surf2)"></textarea></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-rel')">Fechar</button><button class="btn btn-p" onclick="copiarRel()">Copiar Texto</button></div></div></div>
+<div class="mo" id="m-rel" style="display:none"><div class="mb mb-wide"><div class="mh"><h3>Extrato de Notinha</h3><button class="btn btn-s btn-sm" onclick="closeM('m-rel')">X</button></div><div class="mbody"><div class="fg"><label class="fl">Profissional</label><select class="fc" id="rel-prof" onchange="gerarRel()"><option value="">Todos os profissionais</option></select></div><div class="fr" style="margin-bottom:12px"><div><label class="fl">De</label><input type="date" class="fc" id="rel-ini" onchange="gerarRel()"></div><div><label class="fl">Ate</label><input type="date" class="fc" id="rel-fim" onchange="gerarRel()"></div></div><textarea id="rel-txt" readonly style="width:100%;height:300px;font-family:var(--mo);font-size:12px;border:1px solid var(--bdr);border-radius:6px;padding:12px;resize:none;outline:none;line-height:1.6;background:var(--surf2);white-space:pre"></textarea></div><div class="mf"><button class="btn btn-s" onclick="closeM('m-rel')">Fechar</button><button class="btn btn-s" onclick="copiarRelWA()">Copiar p/ WhatsApp</button><button class="btn btn-p" onclick="copiarRel()">Copiar Texto</button></div></div></div>
 
 <!-- FIREBASE SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -637,6 +637,7 @@ async function confirmarEstoque(){
 }
 
 async function loadNotinhas(){
+  CPID=null;CPNM=null;
   document.getElementById('not-grid').style.display='grid';document.getElementById('not-det').style.display='none';
   const snap=await db.collection('profissionais').where('ativo','==',true).get();
   const grid=document.getElementById('not-grid');grid.innerHTML='';
@@ -712,33 +713,107 @@ async function confirmarBonif(){
   await batch.commit();closeM('m-bonif');await loadCaches();toast('Bonificacoes aplicadas!','ok');loadProfTable();
 }
 
-function abrirRel(){document.getElementById('rel-ini').value=firstISO();document.getElementById('rel-fim').value=todayISO();document.getElementById('rel-txt').value='';openM('m-rel');}
+const REL_TIPOS=['venda_profissional','pagamento_notinha','bonificacao','venda_paciente'];
+const PAGNM={dinheiro:'Dinheiro',pix:'PIX',debito:'Cartao Debito',credito:'Cartao Credito',notinha:'Notinha'};
+const RELW=57;
+function relDesc(base,suf){const max=30,s=suf||'',b=String(base||'-');return (b.length+s.length>max?b.substring(0,max-s.length-1)+'.':b)+s;}
+function relLinha(m){
+  const dt=fmtD(m.timestamp);const q=m.quantidade||1;let desc='',sin='  ';
+  if(m.tipo==='venda_profissional'){desc=relDesc(m.produto_nome,q>1?' x'+q:'');sin='+ ';}
+  else if(m.tipo==='pagamento_notinha'){desc=relDesc('PAGAMENTO',m.forma_pagamento?' - '+(PAGNM[m.forma_pagamento]||m.forma_pagamento):'');sin='- ';}
+  else if(m.tipo==='bonificacao'){desc='BONIFICACAO MENSAL';sin='- ';}
+  else{desc=relDesc(m.produto_nome,' [pago]');sin='  ';}
+  return '  '+dt+'  '+desc.padEnd(30)+sin+fmt(m.valor_total).padStart(11);
+}
+function relRodape(d,saldo){
+  let t='  '+'-'.repeat(53)+'\n';
+  if(d.compras>0)t+='  '+'Compras na notinha'.padEnd(42)+'+ '+fmt(d.compras).padStart(11)+'\n';
+  if(d.pagos>0)t+='  '+'Pagamentos'.padEnd(42)+'- '+fmt(d.pagos).padStart(11)+'\n';
+  if(d.bonif>0)t+='  '+'Bonificacoes'.padEnd(42)+'- '+fmt(d.bonif).padStart(11)+'\n';
+  if(d.avista>0)t+='  '+'[pago] Pagas na hora (fora do saldo)'.padEnd(42)+'  '+fmt(d.avista).padStart(11)+'\n';
+  const lbl=saldo>0?'SALDO DEVEDOR ATUAL':saldo<0?'CREDITO A FAVOR':'SALDO ATUAL (em dia)';
+  t+='  '+lbl.padEnd(42)+'  '+fmt(Math.abs(saldo)).padStart(11)+'\n';
+  return t;
+}
+function abrirRel(){
+  const sel=document.getElementById('rel-prof');
+  sel.innerHTML='<option value="">Todos os profissionais</option>';
+  PRC.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.nome;sel.appendChild(o);});
+  sel.value=CPID||'';
+  document.getElementById('rel-ini').value=firstISO();
+  document.getElementById('rel-fim').value=todayISO();
+  document.getElementById('rel-txt').value='';
+  openM('m-rel');
+  gerarRel();
+}
 async function gerarRel(){
-  const out=document.getElementById('rel-txt');
+  const out=document.getElementById('rel-txt');if(!out)return;
   try{
     const vi=document.getElementById('rel-ini').value,vf=document.getElementById('rel-fim').value;
-    if(!vi||!vf){toast('Informe as duas datas.','ko');return;}
+    if(!vi||!vf){out.value='Informe as duas datas.';return;}
     const ini=new Date(vi+'T00:00:00'),fim=new Date(vf+'T23:59:59');
-    out.value='Gerando relatorio...';
-    const snap=await db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp').get();
-    const movs=snap.docs.map(d=>d.data()).filter(m=>m.tipo==='venda_profissional'&&semErro(m)).sort(ordAsc);
+    const profId=document.getElementById('rel-prof').value;
+    out.value='Gerando extrato...';
+    const[mvSnap,prSnap]=await Promise.all([
+      db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp').get(),
+      db.collection('profissionais').get()
+    ]);
+    const SALDO={},NOME={};
+    prSnap.forEach(d=>{SALDO[d.id]=d.data().saldo_devedor||0;NOME[d.id]=d.data().nome;});
+    let movs=mvSnap.docs.map(d=>d.data()).filter(m=>semErro(m)&&m.profissional_id&&REL_TIPOS.includes(m.tipo));
+    if(profId)movs=movs.filter(m=>m.profissional_id===profId);
+    movs.sort(ordAsc);
     const por={};
-    movs.forEach(m=>{const k=m.profissional_id||'sem_id';if(!por[k])por[k]={nome:m.profissional_nome||'(sem nome)',itens:[],total:0};por[k].itens.push(m);por[k].total+=m.valor_total||0;});
+    movs.forEach(m=>{
+      const k=m.profissional_id;const v=m.valor_total||0;
+      if(!por[k])por[k]={nome:NOME[k]||m.profissional_nome||'(sem nome)',itens:[],compras:0,pagos:0,bonif:0,avista:0};
+      por[k].itens.push(m);
+      if(m.tipo==='venda_profissional')por[k].compras+=v;
+      else if(m.tipo==='pagamento_notinha')por[k].pagos+=v;
+      else if(m.tipo==='bonificacao')por[k].bonif+=v;
+      else por[k].avista+=v;
+    });
     const iniF=ini.toLocaleDateString('pt-BR'),fimF=fim.toLocaleDateString('pt-BR');
-    let txt='NOTINHAS - '+iniF+' a '+fimF+'\n'+'='.repeat(40)+'\n';
-    const chaves=Object.keys(por).sort((a,b)=>por[a].nome.localeCompare(por[b].nome));
-    if(!chaves.length){txt+='\nNenhuma compra de profissional no periodo.\n('+snap.size+' movimentacoes lidas no total)';out.value=txt;return;}
-    let geral=0;
-    chaves.forEach(pid=>{const d=por[pid];geral+=d.total;txt+='\n'+d.nome+'\n'+'-'.repeat(36)+'\n';d.itens.forEach(m=>{txt+='  '+fmtD(m.timestamp)+'  '+(m.produto_nome||m.descricao||'-').substring(0,22).padEnd(22)+'  '+fmt(m.valor_total)+'\n';});txt+='  '+'TOTAL'.padEnd(29)+'  '+fmt(d.total)+'\n';});
-    txt+='\n'+'='.repeat(40)+'\nTOTAL GERAL'.padEnd(30)+'  '+fmt(geral)+'\n';
+    let txt='';
+    if(profId){
+      const nm=NOME[profId]||CPNM||'Profissional';const sd=SALDO[profId]||0;
+      txt+='EXTRATO DE NOTINHA\n'+nm+'\nPeriodo: '+iniF+' a '+fimF+'\n'+'='.repeat(RELW)+'\n';
+      const d=por[profId];
+      if(!d){
+        txt+='\n  Nenhuma movimentacao neste periodo.\n\n';
+        txt+=relRodape({compras:0,pagos:0,bonif:0,avista:0},sd);
+      }else{
+        txt+='\n';d.itens.forEach(m=>{txt+=relLinha(m)+'\n';});
+        txt+=relRodape(d,sd);
+      }
+      txt+='='.repeat(RELW)+'\nCentro Medico Judithe Ferreira\n';
+    }else{
+      txt+='EXTRATO DE NOTINHAS - TODOS OS PROFISSIONAIS\nPeriodo: '+iniF+' a '+fimF+'\n'+'='.repeat(RELW)+'\n';
+      const ks=Object.keys(por).sort((a,b)=>por[a].nome.localeCompare(por[b].nome));
+      if(!ks.length){out.value=txt+'\n  Nenhuma movimentacao de profissional no periodo.\n';return;}
+      let tc=0,tp=0,tb=0,ts=0;
+      ks.forEach(k=>{
+        const d=por[k];tc+=d.compras;tp+=d.pagos;tb+=d.bonif;
+        txt+='\n'+d.nome+'\n'+'-'.repeat(RELW)+'\n';
+        d.itens.forEach(m=>{txt+=relLinha(m)+'\n';});
+        txt+=relRodape(d,SALDO[k]||0);
+      });
+      Object.keys(SALDO).forEach(k=>{if(SALDO[k]>0)ts+=SALDO[k];});
+      txt+='\n'+'='.repeat(RELW)+'\n';
+      txt+='  '+'TOTAL COMPRAS NO PERIODO'.padEnd(42)+'+ '+fmt(tc).padStart(11)+'\n';
+      txt+='  '+'TOTAL PAGAMENTOS'.padEnd(42)+'- '+fmt(tp).padStart(11)+'\n';
+      txt+='  '+'TOTAL BONIFICACOES'.padEnd(42)+'- '+fmt(tb).padStart(11)+'\n';
+      txt+='  '+'DEVIDO HOJE (TODOS)'.padEnd(42)+'  '+fmt(ts).padStart(11)+'\n';
+    }
     out.value=txt;
   }catch(e){
     console.error(e);
-    out.value='ERRO AO GERAR RELATORIO\n\n'+(e.message||e)+'\n\nAbra o console (F12) para detalhes.';
+    out.value='ERRO AO GERAR EXTRATO\n\n'+(e.message||e)+'\n\nAbra o console (F12) para detalhes.';
     toast('Erro: '+(e.message||e),'ko');
   }
 }
-function copiarRel(){navigator.clipboard.writeText(document.getElementById('rel-txt').value).then(()=>toast('Copiado!','ok'));}
+function copiarRel(){const t=document.getElementById('rel-txt').value;if(!t)return;navigator.clipboard.writeText(t).then(()=>toast('Copiado!','ok'));}
+function copiarRelWA(){const t=document.getElementById('rel-txt').value;if(!t)return;navigator.clipboard.writeText('```\n'+t+'```').then(()=>toast('Copiado com formatacao do WhatsApp!','ok'));}
 
 async function loadCaixa(){
   const vi=document.getElementById('cx-ini').value,vf=document.getElementById('cx-fim').value;
