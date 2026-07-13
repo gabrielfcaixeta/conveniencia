@@ -369,6 +369,11 @@ let CPID=null, CPNM=null, CXTIPO='sangria', PFILTRO='todos';
 const fmt=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const fmtDT=ts=>{if(!ts)return'-';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});};
 const fmtD=ts=>{if(!ts)return'-';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('pt-BR');};
+const tsMs=ts=>{if(!ts)return 0;const d=ts.toDate?ts.toDate():new Date(ts);return d.getTime();};
+const semErro=m=>m.marcado_erro!==true;
+const ordDesc=(a,b)=>tsMs(b.timestamp)-tsMs(a.timestamp);
+const ordAsc=(a,b)=>tsMs(a.timestamp)-tsMs(b.timestamp);
+window.addEventListener('unhandledrejection',e=>{const msg=(e.reason&&e.reason.message)||String(e.reason);console.error('[FALHA]',e.reason);try{toast('Erro: '+msg,'ko');}catch(_){}});
 const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
 const today23=()=>{const d=new Date();d.setHours(23,59,59,999);return d;};
 const todayISO=()=>new Date().toISOString().split('T')[0];
@@ -416,13 +421,13 @@ async function loadLoginUsers(){
 async function showPublicView(profId){
   document.getElementById('lo').style.display='none';
   document.getElementById('pub-view').style.display='block';
-  const[profDoc,mvSnap]=await Promise.all([db.collection('profissionais').doc(profId).get(),db.collection('movimentacoes').where('profissional_id','==',profId).where('marcado_erro','==',false).orderBy('timestamp','desc').get()]);
+  const[profDoc,mvSnap]=await Promise.all([db.collection('profissionais').doc(profId).get(),db.collection('movimentacoes').where('profissional_id','==',profId).get()]);
   if(!profDoc.exists){document.getElementById('pub-nm').textContent='Profissional nao encontrado';return;}
   const pd=profDoc.data();const sd=pd.saldo_devedor||0;
   document.getElementById('pub-nm').textContent=pd.nome;
   const sdEl=document.getElementById('pub-sd');sdEl.textContent=sd>0?fmt(sd)+'  (devendo)':sd<0?'Credito: '+fmt(Math.abs(sd)):'Em dia';sdEl.style.color=sd>0?'#f87171':sd<0?'#4ade80':'#94a3b8';
   const tb=document.getElementById('pub-tb');tb.innerHTML='';
-  const movs=mvSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const movs=mvSnap.docs.map(d=>({id:d.id,...d.data()})).filter(semErro).sort(ordDesc);
   if(!movs.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Nenhum lancamento</td></tr>';return;}
   movs.forEach(m=>{const tr=document.createElement('tr');const isCompra=m.tipo==='venda_profissional';const isPgto=['pagamento_notinha','bonificacao'].includes(m.tipo);tr.innerHTML='<td style="font-size:12px">'+fmtD(m.timestamp)+'</td><td>'+(m.produto_nome||m.descricao||'-')+'</td><td style="font-family:var(--mo);color:'+(isCompra?'var(--red)':isPgto?'var(--grn)':'var(--muted)')+'">'+( isCompra?'+ ':isPgto?'- ':'')+fmt(m.valor_total)+'</td><td>'+tipoBadge(m.tipo)+'</td>';tb.appendChild(tr);});
 }
@@ -492,8 +497,8 @@ async function salvarCfg(){
 
 async function loadDashboard(){
   try{
-    const[mvSnap,prSnap]=await Promise.all([db.collection('movimentacoes').where('timestamp','>=',today0()).where('timestamp','<=',today23()).where('marcado_erro','==',false).orderBy('timestamp','desc').get(),db.collection('profissionais').where('ativo','==',true).get()]);
-    const movs=mvSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const[mvSnap,prSnap]=await Promise.all([db.collection('movimentacoes').where('timestamp','>=',today0()).where('timestamp','<=',today23()).orderBy('timestamp','desc').get(),db.collection('profissionais').where('ativo','==',true).get()]);
+    const movs=mvSnap.docs.map(d=>({id:d.id,...d.data()})).filter(semErro);
     let fis=0,ban=0,vd=0,vq=0,gc=0,gl=0;
     movs.forEach(m=>{const v=m.valor_total||0,l=m.valor_liquido||v;
       if(m.tipo==='venda_paciente'){if(m.forma_pagamento==='dinheiro')fis+=v;else if(m.forma_pagamento==='pix')ban+=v;else ban+=l;vd+=v;vq++;if(m.produto_grupo==='conveniencia')gc+=v;if(m.produto_grupo==='livraria')gl+=v;}
@@ -647,8 +652,8 @@ async function loadNotinhas(){
 }
 async function abrirDetNot(id,nm){
   CPID=id;CPNM=nm;document.getElementById('not-grid').style.display='none';document.getElementById('not-det').style.display='block';document.getElementById('nd-nm').textContent=nm;
-  const[mvSnap,prDoc]=await Promise.all([db.collection('movimentacoes').where('profissional_id','==',id).where('marcado_erro','==',false).orderBy('timestamp','desc').get(),db.collection('profissionais').doc(id).get()]);
-  const movs=mvSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const[mvSnap,prDoc]=await Promise.all([db.collection('movimentacoes').where('profissional_id','==',id).get(),db.collection('profissionais').doc(id).get()]);
+  const movs=mvSnap.docs.map(d=>({id:d.id,...d.data()})).filter(semErro).sort(ordDesc);
   let cp=0,pg=0;movs.forEach(m=>{if(m.tipo==='venda_profissional')cp+=m.valor_total||0;if(['pagamento_notinha','bonificacao'].includes(m.tipo))pg+=m.valor_total||0;});
   const sd=prDoc.data().saldo_devedor||0;
   const sdEl=document.getElementById('nd-sd');sdEl.textContent=fmt(Math.abs(sd));sdEl.style.color=sd>0?'var(--red)':'var(--grn)';
@@ -709,21 +714,38 @@ async function confirmarBonif(){
 
 function abrirRel(){document.getElementById('rel-ini').value=firstISO();document.getElementById('rel-fim').value=todayISO();document.getElementById('rel-txt').value='';openM('m-rel');}
 async function gerarRel(){
-  const ini=new Date(document.getElementById('rel-ini').value+'T00:00:00');const fim=new Date(document.getElementById('rel-fim').value+'T23:59:59');
-  const snap=await db.collection('movimentacoes').where('tipo','==','venda_profissional').where('marcado_erro','==',false).where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp').get();
-  const por={};snap.forEach(doc=>{const m=doc.data();if(!por[m.profissional_id])por[m.profissional_id]={nome:m.profissional_nome,itens:[],total:0};por[m.profissional_id].itens.push(m);por[m.profissional_id].total+=m.valor_total||0;});
-  const iniF=ini.toLocaleDateString('pt-BR'),fimF=fim.toLocaleDateString('pt-BR');
-  let txt='NOTINHAS - '+iniF+' a '+fimF+'\n'+'='.repeat(40)+'\n';
-  if(!Object.keys(por).length){txt+='Nenhuma compra no periodo.';document.getElementById('rel-txt').value=txt;return;}
-  for(const pid in por){const d=por[pid];txt+='\n'+d.nome+'\n'+'-'.repeat(36)+'\n';d.itens.forEach(m=>{txt+='  '+fmtD(m.timestamp)+'  '+(m.produto_nome||'-').substring(0,22).padEnd(22)+'  '+fmt(m.valor_total)+'\n';});txt+='  '+'TOTAL'.padEnd(29)+'  '+fmt(d.total)+'\n';}
-  document.getElementById('rel-txt').value=txt;
+  const out=document.getElementById('rel-txt');
+  try{
+    const vi=document.getElementById('rel-ini').value,vf=document.getElementById('rel-fim').value;
+    if(!vi||!vf){toast('Informe as duas datas.','ko');return;}
+    const ini=new Date(vi+'T00:00:00'),fim=new Date(vf+'T23:59:59');
+    out.value='Gerando relatorio...';
+    const snap=await db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp').get();
+    const movs=snap.docs.map(d=>d.data()).filter(m=>m.tipo==='venda_profissional'&&semErro(m)).sort(ordAsc);
+    const por={};
+    movs.forEach(m=>{const k=m.profissional_id||'sem_id';if(!por[k])por[k]={nome:m.profissional_nome||'(sem nome)',itens:[],total:0};por[k].itens.push(m);por[k].total+=m.valor_total||0;});
+    const iniF=ini.toLocaleDateString('pt-BR'),fimF=fim.toLocaleDateString('pt-BR');
+    let txt='NOTINHAS - '+iniF+' a '+fimF+'\n'+'='.repeat(40)+'\n';
+    const chaves=Object.keys(por).sort((a,b)=>por[a].nome.localeCompare(por[b].nome));
+    if(!chaves.length){txt+='\nNenhuma compra de profissional no periodo.\n('+snap.size+' movimentacoes lidas no total)';out.value=txt;return;}
+    let geral=0;
+    chaves.forEach(pid=>{const d=por[pid];geral+=d.total;txt+='\n'+d.nome+'\n'+'-'.repeat(36)+'\n';d.itens.forEach(m=>{txt+='  '+fmtD(m.timestamp)+'  '+(m.produto_nome||m.descricao||'-').substring(0,22).padEnd(22)+'  '+fmt(m.valor_total)+'\n';});txt+='  '+'TOTAL'.padEnd(29)+'  '+fmt(d.total)+'\n';});
+    txt+='\n'+'='.repeat(40)+'\nTOTAL GERAL'.padEnd(30)+'  '+fmt(geral)+'\n';
+    out.value=txt;
+  }catch(e){
+    console.error(e);
+    out.value='ERRO AO GERAR RELATORIO\n\n'+(e.message||e)+'\n\nAbra o console (F12) para detalhes.';
+    toast('Erro: '+(e.message||e),'ko');
+  }
 }
 function copiarRel(){navigator.clipboard.writeText(document.getElementById('rel-txt').value).then(()=>toast('Copiado!','ok'));}
 
 async function loadCaixa(){
-  const ini=new Date(document.getElementById('cx-ini').value+'T00:00:00');const fim=new Date(document.getElementById('cx-fim').value+'T23:59:59');
-  const snap=await db.collection('movimentacoes').where('marcado_erro','==',false).where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp','desc').get();
-  const movs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const vi=document.getElementById('cx-ini').value,vf=document.getElementById('cx-fim').value;
+  if(!vi||!vf){toast('Informe as duas datas.','ko');return;}
+  const ini=new Date(vi+'T00:00:00');const fim=new Date(vf+'T23:59:59');
+  const snap=await db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp','desc').get();
+  const movs=snap.docs.map(d=>({id:d.id,...d.data()})).filter(semErro);
   let edin=0,pnot=0,supr=0,sang=0,pix=0,deb=0,cred=0,tax=0;
   movs.forEach(m=>{const v=m.valor_total||0,l=m.valor_liquido||v,t=m.taxa_valor||0;
     if(m.tipo==='venda_paciente'||m.tipo==='pagamento_notinha'){if(m.forma_pagamento==='dinheiro'){if(m.tipo==='venda_paciente')edin+=v;else pnot+=v;}else if(m.forma_pagamento==='pix')pix+=v;else if(m.forma_pagamento==='debito'){deb+=l;tax+=t;}else if(m.forma_pagamento==='credito'){cred+=l;tax+=t;}}
@@ -844,12 +866,14 @@ async function toggleProf(id,ativo){
 }
 
 async function loadHistorico(){
-  const ini=new Date(document.getElementById('h-ini').value+'T00:00:00');const fim=new Date(document.getElementById('h-fim').value+'T23:59:59');const tipo=document.getElementById('h-tipo').value;
-  let q=db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp','desc');
-  if(tipo)q=q.where('tipo','==',tipo);
-  const snap=await q.get();const tb=document.getElementById('h-tb');tb.innerHTML='';
-  if(snap.empty){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Nenhum lancamento encontrado</td></tr>';return;}
-  snap.forEach(doc=>{const m={id:doc.id,...doc.data()};const tr=document.createElement('tr');if(m.marcado_erro)tr.classList.add('err-row');tr.innerHTML='<td style="font-size:12px">'+fmtDT(m.timestamp)+'</td><td>'+tipoBadge(m.tipo)+'</td><td>'+(m.produto_nome||m.descricao||'-')+'</td><td style="color:var(--txt2)">'+(m.profissional_nome||m.cliente_tipo||'-')+'</td><td>'+pagBadge(m.forma_pagamento)+'</td><td style="font-family:var(--mo)">'+fmt(m.valor_total)+'</td><td style="color:var(--muted);font-size:12px">'+(m.secretaria_nome||'-')+'</td><td>'+(m.marcado_erro?'<span class="bg bg-r" title="'+m.motivo_erro+'">Erro</span>':'<button class="btn btn-s btn-sm" onclick="abrirMarcarErro(\''+m.id+'\')">Erro</button>')+'</td>';tb.appendChild(tr);});
+  const vi=document.getElementById('h-ini').value,vf=document.getElementById('h-fim').value;
+  if(!vi||!vf){toast('Informe as duas datas.','ko');return;}
+  const ini=new Date(vi+'T00:00:00');const fim=new Date(vf+'T23:59:59');const tipo=document.getElementById('h-tipo').value;
+  const snap=await db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp','desc').get();
+  const tb=document.getElementById('h-tb');tb.innerHTML='';
+  const movs=snap.docs.map(d=>({id:d.id,...d.data()})).filter(m=>!tipo||m.tipo===tipo);
+  if(!movs.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Nenhum lancamento encontrado</td></tr>';return;}
+  movs.forEach(m=>{const tr=document.createElement('tr');if(m.marcado_erro)tr.classList.add('err-row');tr.innerHTML='<td style="font-size:12px">'+fmtDT(m.timestamp)+'</td><td>'+tipoBadge(m.tipo)+'</td><td>'+(m.produto_nome||m.descricao||'-')+'</td><td style="color:var(--txt2)">'+(m.profissional_nome||m.cliente_tipo||'-')+'</td><td>'+pagBadge(m.forma_pagamento)+'</td><td style="font-family:var(--mo)">'+fmt(m.valor_total)+'</td><td style="color:var(--muted);font-size:12px">'+(m.secretaria_nome||'-')+'</td><td>'+(m.marcado_erro?'<span class="bg bg-r" title="'+(m.motivo_erro||'')+'">Erro</span>':'<button class="btn btn-s btn-sm" onclick="abrirMarcarErro(\''+m.id+'\')">Erro</button>')+'</td>';tb.appendChild(tr);});
 }
 
 async function loadSecLista(){
