@@ -506,7 +506,7 @@ async function loadDashboard(){
       if(m.tipo==='pagamento_notinha'){if(m.forma_pagamento==='dinheiro')fis+=v;else if(m.forma_pagamento==='pix')ban+=v;else ban+=(m.valor_liquido||v);}
       if(m.tipo==='sangria')fis-=v;if(m.tipo==='suprimento')fis+=v;
     });
-    let tn=0,qn=0;prSnap.forEach(d=>{const s=d.data().saldo_devedor||0;if(s>0){tn+=s;qn++;}});
+    let tn=0,qn=0;prSnap.forEach(d=>{const x=d.data();if(x.oculto===true)return;const s=x.saldo_devedor||0;if(s>0){tn+=s;qn++;}});
     document.getElementById('d-fisico').textContent=fmt(fis);document.getElementById('d-banco').textContent=fmt(ban);
     document.getElementById('d-not').textContent=fmt(tn);document.getElementById('d-not-s').textContent=qn+' profissionais devendo';
     document.getElementById('d-vd').textContent=fmt(vd);document.getElementById('d-vd-s').textContent=vq+' vendas hoje';
@@ -641,12 +641,13 @@ async function loadNotinhas(){
   document.getElementById('not-grid').style.display='grid';document.getElementById('not-det').style.display='none';
   const snap=await db.collection('profissionais').where('ativo','==',true).get();
   const grid=document.getElementById('not-grid');grid.innerHTML='';
-  if(snap.empty){grid.innerHTML='<p style="color:var(--muted)">Nenhum profissional cadastrado.</p>';return;}
-  snap.forEach(doc=>{
-    const p={id:doc.id,...doc.data()};const s=p.saldo_devedor||0;
+  const profs=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.oculto!==true).sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(!profs.length){grid.innerHTML='<p style="color:var(--muted)">Nenhum profissional cadastrado.</p>';return;}
+  profs.forEach(p=>{
+    const s=p.saldo_devedor||0;
     const card=document.createElement('div');card.className='nc';card.onclick=()=>abrirDetNot(p.id,p.nome);
     const cls=s>0?'dev':s<0?'crd':'ok';const sl=s>0?fmt(s):s<0?'Credito: '+fmt(Math.abs(s)):'Em dia';
-    card.innerHTML='<div style="display:flex;justify-content:space-between"><div class="nc-nm">'+p.nome+'</div><span id="lnk-'+p.id+'" style="cursor:pointer;font-size:15px;opacity:.6">&#128279;</span></div><div class="nc-sd '+cls+'">'+sl+'</div><div class="nc-it">Bonificacao: '+fmt(p.bonificacao_mensal||CFG.valor_bonificacao_padrao||100)+'/mes</div>';
+    card.innerHTML='<div style="display:flex;justify-content:space-between"><div class="nc-nm">'+p.nome+'</div><span id="lnk-'+p.id+'" style="cursor:pointer;font-size:15px;opacity:.6">&#128279;</span></div><div class="nc-sd '+cls+'">'+sl+'</div><div class="nc-it">Bonificacao: '+fmt(p.bonificacao_mensal!=null?p.bonificacao_mensal:(CFG.valor_bonificacao_padrao||100))+'/mes</div>';
     grid.appendChild(card);
     document.getElementById('lnk-'+p.id).onclick=e=>{e.stopPropagation();gerarLink(p.id);};
   });
@@ -738,7 +739,7 @@ function relRodape(d,saldo){
 function abrirRel(){
   const sel=document.getElementById('rel-prof');
   sel.innerHTML='<option value="">Todos os profissionais</option>';
-  PRC.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.nome;sel.appendChild(o);});
+  PRC.filter(p=>isAdmin()||p.oculto!==true).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.nome+(p.oculto?' (oculto)':'');sel.appendChild(o);});
   sel.value=CPID||'';
   document.getElementById('rel-ini').value=firstISO();
   document.getElementById('rel-fim').value=todayISO();
@@ -758,10 +759,11 @@ async function gerarRel(){
       db.collection('movimentacoes').where('timestamp','>=',ini).where('timestamp','<=',fim).orderBy('timestamp').get(),
       db.collection('profissionais').get()
     ]);
-    const SALDO={},NOME={};
-    prSnap.forEach(d=>{SALDO[d.id]=d.data().saldo_devedor||0;NOME[d.id]=d.data().nome;});
+    const SALDO={},NOME={},OCULTO={};
+    prSnap.forEach(d=>{const x=d.data();SALDO[d.id]=x.saldo_devedor||0;NOME[d.id]=x.nome;OCULTO[d.id]=x.oculto===true;});
     let movs=mvSnap.docs.map(d=>d.data()).filter(m=>semErro(m)&&m.profissional_id&&REL_TIPOS.includes(m.tipo));
     if(profId)movs=movs.filter(m=>m.profissional_id===profId);
+    else movs=movs.filter(m=>!OCULTO[m.profissional_id]);
     movs.sort(ordAsc);
     const por={};
     movs.forEach(m=>{
@@ -798,7 +800,7 @@ async function gerarRel(){
         d.itens.forEach(m=>{txt+=relLinha(m)+'\n';});
         txt+=relRodape(d,SALDO[k]||0);
       });
-      Object.keys(SALDO).forEach(k=>{if(SALDO[k]>0)ts+=SALDO[k];});
+      Object.keys(SALDO).forEach(k=>{if(SALDO[k]>0&&!OCULTO[k])ts+=SALDO[k];});
       txt+='\n'+'='.repeat(RELW)+'\n';
       txt+='  '+'TOTAL COMPRAS NO PERIODO'.padEnd(42)+'+ '+fmt(tc).padStart(11)+'\n';
       txt+='  '+'TOTAL PAGAMENTOS'.padEnd(42)+'- '+fmt(tp).padStart(11)+'\n';
@@ -889,11 +891,17 @@ async function loadProfTable(){
     const bonif=p.bonificacao_mensal!=null?p.bonificacao_mensal:(CFG.valor_bonificacao_padrao!=null?CFG.valor_bonificacao_padrao:100);
     const be=document.createElement('button');be.className='btn btn-s btn-sm';be.textContent='Editar';be.onclick=()=>editProf(p);
     const bt=document.createElement('button');bt.className='btn btn-s btn-sm';bt.textContent=p.ativo?'Desativar':'Ativar';bt.onclick=()=>toggleProf(p.id,p.ativo);
-    tr.innerHTML='<td style="font-weight:500">'+p.nome+'</td><td style="font-family:var(--mo);color:'+sdClr+'">'+sdTxt+'</td><td style="font-family:var(--mo)">'+fmt(bonif)+'</td><td>'+(p.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+'</td><td></td>';
-    tr.querySelector('td:last-child').style.cssText='display:flex;gap:6px';
-    tr.querySelector('td:last-child').appendChild(be);tr.querySelector('td:last-child').appendChild(bt);
+    const status=(p.ativo?'<span class="bg bg-g">Ativo</span>':'<span class="bg bg-x">Inativo</span>')+(p.oculto?' <span class="bg bg-x">Oculto</span>':'');
+    tr.innerHTML='<td style="font-weight:500">'+p.nome+'</td><td style="font-family:var(--mo);color:'+sdClr+'">'+sdTxt+'</td><td style="font-family:var(--mo)">'+fmt(bonif)+'</td><td>'+status+'</td><td></td>';
+    const acoes=tr.querySelector('td:last-child');acoes.style.cssText='display:flex;gap:6px';
+    acoes.appendChild(be);acoes.appendChild(bt);
+    if(isAdmin()){const bo=document.createElement('button');bo.className='btn btn-s btn-sm';bo.textContent=p.oculto?'Exibir':'Ocultar';bo.title='Ocultar a notinha da tela Notinhas e do extrato geral';bo.onclick=()=>toggleOculto(p.id,p.oculto===true);acoes.appendChild(bo);}
     tb.appendChild(tr);
   });
+}
+async function toggleOculto(id,oculto){
+  await db.collection('profissionais').doc(id).update({oculto:!oculto});
+  await loadCaches();toast(oculto?'Notinha visivel novamente.':'Notinha ocultada.','ok');loadProfTable();
 }
 function abrirProf(){
   document.getElementById('mpr-id').value='';
